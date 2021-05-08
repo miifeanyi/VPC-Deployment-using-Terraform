@@ -140,3 +140,45 @@ resource "aws_route_table_association" "private2" {
   subnet_id      = aws_subnet.private2.id
   route_table_id = aws_route_table.private-route-table-2.id
 }
+
+resource "aws_nat_gateway" "ngw1" {
+  #The Allocation ID of the elastic IP address
+  allocation_id = "aws_eip.NAT1.id"
+
+  #Public subnet in which to place the gateway
+  subnet_id = "aws_subnet.public1.id"
+
+  tags = {
+    "Name" = "NAT 1"
+  }
+}
+
+resource "aws_nat_gateway" "ngw2" {
+  #The Allocation ID of the elastic IP address
+  allocation_id = "aws_eip.NAT2.id"
+
+  #Public subnet in which to place the gateway
+  subnet_id = "aws_subnet.public2.id"
+
+  tags = {
+    "Name" = "NAT 2"
+  }
+}
+
+#Create the Internet Gateway
+resource "aws_internet_gateway" "gw" {
+  vpc_id = "aws_vpc.mainvpc.id"
+}
+
+#NAT Gateway - this is used to enable instances in a private subnet to connect to the internet. 
+#We need to allocate a public static IP address for the NAT Gateway. We will use elastic IP address service to achive this.
+#use depends_on to set an explicit dependency on the internet gateway. We will use two NAT gateways to make it highly available 
+#placing them in different availabilty zones
+
+resource "aws_eip" "NAT1" {
+  depends_on = [aws_internet_gateway.gw]
+}
+
+resource "aws_eip" "NAT2" {
+  depends_on = [aws_internet_gateway.gw]
+}
