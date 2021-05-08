@@ -1,4 +1,3 @@
-#Create a Security group allowing ports 22,80,443
 resource "aws_security_group" "allow_web" {
   name        = "allow_web_traffic"
   description = "Allow Web inbound traffic"
