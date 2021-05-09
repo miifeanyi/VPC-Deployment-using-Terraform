@@ -1,49 +1,39 @@
 resource "aws_vpc" "mainvpc" {
-  cidr_block = "192.168.0.0/16"
+  cidr_block = var.vpc_cidr_block
 
-  tags = {
-    "Name" = "Production"
-  }
+  tags = var.resource_tags
 }
 
 resource "aws_subnet" "public1" {
   vpc_id            = aws_vpc.mainvpc.id
-  cidr_block        = "192.168.0.0/18"
-  availability_zone = "us-east-1a"
+  cidr_block        = element(var.public_subnet_cidr_blocks, 0)
+  availability_zone = element(var.az, 0)
 
-  tags = {
-    "Name" = "public-us-east-1a"
-  }
+  tags = var.resource_tags
 }
 
 resource "aws_subnet" "public2" {
   vpc_id            = aws_vpc.mainvpc.id
-  cidr_block        = "192.168.64.0/18"
-  availability_zone = "us-east-1b"
+  cidr_block        = element(var.public_subnet_cidr_blocks, 1)
+  availability_zone = element(var.az, 1)
 
-  tags = {
-    "Name" = "public-us-east-1b"
-  }
+  tags = var.resource_tags
 }
 
 resource "aws_subnet" "private1" {
   vpc_id            = aws_vpc.mainvpc.id
-  cidr_block        = "192.168.128.0/18"
-  availability_zone = "us-east-1a"
+  cidr_block        = element(var.private_subnet_cidr_blocks, 0)
+  availability_zone = element(var.az, 0)
 
-  tags = {
-    "Name" = "private-us-east-1a"
-  }
+  tags = var.resource_tags
 }
 
 resource "aws_subnet" "private2" {
   vpc_id            = aws_vpc.mainvpc.id
-  cidr_block        = "192.168.192.0/18"
-  availability_zone = "us-east-1a"
+  cidr_block        = element(var.private_subnet_cidr_blocks, 1)
+  availability_zone = element(var.az, 1)
 
-  tags = {
-    "Name" = "private-us-east-1b"
-  }
+  tags = var.resource_tags
 }
 
 resource "aws_security_group" "allow_web" {
@@ -56,7 +46,7 @@ resource "aws_security_group" "allow_web" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.public_subnet_cidr_blocks]
   }
 
   ingress {
@@ -64,7 +54,7 @@ resource "aws_security_group" "allow_web" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.public_subnet_cidr_blocks]
   }
 
   ingress {
@@ -72,19 +62,17 @@ resource "aws_security_group" "allow_web" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.public_subnet_cidr_blocks]
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.public_subnet_cidr_blocks]
   }
 
-  tags = {
-    Name = "allow_web"
-  }
+  tags = var.resource_tags
 }
 
 resource "aws_route_table" "public-route-table" {
@@ -138,28 +126,22 @@ resource "aws_nat_gateway" "ngw1" {
   allocation_id = aws_eip.NAT1.id
   subnet_id     = aws_subnet.public1.id
 
-  tags = {
-    "Name" = "NAT 1"
-  }
+  tags = var.resource_tags
 }
 
 resource "aws_nat_gateway" "ngw2" {
   allocation_id = aws_eip.NAT2.id
   subnet_id     = aws_subnet.public2.id
 
-  tags = {
-    "Name" = "NAT 2"
-  }
+  tags = var.resource_tags
 }
 
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.mainvpc.id
 }
 
-resource "aws_eip" "NAT1" {
+resource "aws_eip" "default" {
   depends_on = [aws_internet_gateway.gw]
-}
-
-resource "aws_eip" "NAT2" {
-  depends_on = [aws_internet_gateway.gw]
+  count      = 2
+  name       = "NAT-${count.index}"
 }
