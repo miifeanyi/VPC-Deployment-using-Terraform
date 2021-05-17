@@ -3,5 +3,6 @@ terraform {
 }
 
 module "my_vpc" {
+  count = 2
   source = "./modules/vpc"
 }
