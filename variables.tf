@@ -9,7 +9,19 @@ variable "aws_region" {
 
 variable "vpc_cidr_block" {
   type    = string
-  default = "10.0.0.0/23"
+}
+
+variable "vpc_instance" {
+  type = number
+  default = 2  
+}
+
+variable "vpcname" {
+  type = string
+}
+
+variable "vpc_id" {
+  type = string
 }
 
 variable "public_subnet_cidr_blocks" {
