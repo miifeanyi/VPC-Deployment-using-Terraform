@@ -2,11 +2,14 @@ terraform {
   required_version = ">= 0.14"
 }
 
-module "my_vpc" {
-  count = 2
-  
-  source = "./modules/vpc"
-  vpcname = "${var.vpcname}"
-  vpc_cidr_block = "${var.vpc_cidr_block}"
-  vpc_id = "${var.vpc_id}"
+module "my_vpc_a" {
+  source         = "./modules/vpc"
+  vpcname        = "vpc_a"
+  vpc_cidr_block = "10.0.0.0/16"
+}
+
+module "my_vpc_b" {
+  source         = "./modules/vpc"
+  vpcname        = "vpc_b"
+  vpc_cidr_block = "10.1.0.0/16"
 }
