@@ -1,11 +1,9 @@
-module "my_vpcA" {
+module "myvpcA" {
   source     = "../../modules/vpc"
-  vpc_name   = "testvpc"
-  cidr_block = "10.0.0.0/17"
+  cidr_block = var.cidr_block
 }
 
-module "my_vpcB" {
+module "myvpcB" {
   source     = "../../modules/vpc"
-  vpc_name   = "dev_vpc"
-  cidr_block = "10.0.128.0/17"
+  cidr_block = var.cidr_block
 }

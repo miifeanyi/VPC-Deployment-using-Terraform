@@ -1,3 +1,7 @@
 provider "aws" {
-  region = var.aws_region
+  region = local.region
+}
+
+locals {
+  region = "us-east-1"
 }
