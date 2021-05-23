@@ -3,16 +3,13 @@
 # }
 
 variable "cidr_block" {
-  type = map
-  default = {
-    "0" = "10.16.0.0/20"
-    "1" = "10.16.16.0/20"
-  }
+  type = string
+  default = "10.0.0.0/23"
 }
 
 variable "vpcs" {
-  type    = list
-  default = ["dev_vpc", "test_vpc"]
+  type    = string
+  default = "dev_vpc"
 }
 
 variable "az" {
@@ -22,5 +19,25 @@ variable "az" {
 
 variable "private_subnet_cidr_blocks" {
   type    = list(string)
-  default = ["10.16.32.0/20", "10.16.48.0/20", "10.16.64.0/20", "10.16.80.0/20"]
+  default = ["10.0.0.0/26", "10.0.0.64/26"]
+}
+
+variable "public_subnet_cidr_blocks" {
+  type    = list(string)
+  default = ["10.0.0.128/26", "10.0.0.192/26"]
+}
+
+variable "public_route_table" {
+  type    = list(any)
+  default = ["public_route_table_1", "public_route_table_2"]
+}
+
+variable "private_route_table" {
+  type    = list(any)
+  default = ["private_route_table_1", "private_route_table_2"]
+}
+
+variable "ingress_values" {
+  type    = list(number)
+  default = [443, 80, 22]
 }
